@@ -1,0 +1,19 @@
+<mvc:View controllerName = "alight.proyectofinal.controller.Main"
+    xmlns = "sap.m"
+    xmlns:mvc = "sap.ui.core.mvc" displayBlock = "true">
+    <Page id = "menuPrincipal" title="{i18n>menuPrincipal}" titleAlignment = "Center">
+        <Panel id = "empleados" expandable = "true" expanded = "true" headerText = "{i18n>empleados}">
+            <GenericTile id = "crearEmpleado" headerImage="sap-icon://add-employee" press = ".onNewEmployee" class = "sapUiSmallMarginEnd">
+                <TileContent id="_IDGenTileContent1" footer="{i18n>crearEmpleado}" />
+            </GenericTile>
+            <GenericTile id = "verEmpleados" headerImage="sap-icon://employee-lookup" press = ".onShowEmployee">
+                <TileContent id="_IDGenTileContent2" footer="{i18n>verEmpleados}" />
+            </GenericTile>
+        </Panel>
+        <Panel id = "pedidos" expandable = "true" expanded = "true" headerText = "{i18n>pedidos}">
+            <GenericTile id = "firmarPedido" headerImage="sap-icon://signature" press = ".onSignOrder">
+                <TileContent id="_IDGenTileContent3" footer="{i18n>firmarPedido}" />
+            </GenericTile>
+        </Panel>
+    </Page>
+</mvc:View>

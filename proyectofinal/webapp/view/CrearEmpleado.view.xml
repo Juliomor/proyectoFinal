@@ -1,0 +1,105 @@
+<mvc:View controllerName = "alight.proyectofinal.controller.CrearEmpleado"
+    xmlns = "sap.m"
+    xmlns:mvc = "sap.ui.core.mvc"
+    xmlns:upload = "sap.m.upload" 
+    xmlns:form = "sap.ui.layout.form" 
+    displayBlock = "true">
+
+    <NavContainer id = "wizardNavContainer">
+        <pages>
+            <Page id = "crearEmpleado" title = "{i18n>crearEmpleado}" titleAlignment = "Center">
+                <content>
+                    <Wizard id = "empleadoWizard" complete = ".onWizardComplete">
+                        <WizardStep id = "tipoEmpleado" title = "{i18n>tipoEmpleado}" validated = "false">
+                            <MessageStrip id = "_IDGenMessageStrip1" type = "Information" text = "{i18n>tipoEmpleadoMsg}" showIcon = "true" class = "sapUiSmallMarginBottom"/>
+                            <HBox id="_IDGenHBox1" justifyContent="Center">
+                                <ToggleButton id = "interno" text = "{i18n>empleadoInterno}" press = ".onInternoPress" />
+                                <ToggleButton id = "autonomo" text = "{i18n>empleadoAutonomo}" press = ".onAutonomoPress" class = "sapUiSmallMarginBeginEnd"/>
+                                <ToggleButton id = "gerente" text = "{i18n>empleadoGerente}" press = ".onGerentePress"/>
+                            </HBox>
+                        </WizardStep>
+                        <WizardStep id = "datosEmpleado" title = "{i18n>datosEmpleado}" validated = "false">
+                            <MessageStrip id = "_IDGenMessageStrip2" type = "Information" text = "{i18n>datosEmpleadoMsg}" showIcon = "true" class = "sapUiSmallMarginBottom"/>
+                            <form:SimpleForm id = "formDatosEmpleado" editable = "true">
+                                <Label id = "_IDGenLabel1" text = "{i18n>nombre}" required = "true"/>
+                                <Input id = "nombreEmpleado" value = "{employeeModel>/FirstName}" liveChange = ".onNombreChange"
+                                    valueState = "{employeeModel>/nombreState}" valueStateText = "{i18n>campoObligatorio}"/>
+                                <Label id = "_IDGenLabel2" text = "{i18n>apellidos}" required = "true"/>
+                                <Input id = "apellidosEmpleado" value = "{employeeModel>/LastName}" liveChange = ".onApellidosChange"
+                                    valueState = "{employeeModel>/apellidosState}" valueStateText = "{i18n>campoObligatorio}"/>
+                                <Label id = "_IDGenLabel3" text = "{= ${employeeModel>/Type} === 1 ? ${i18n>cif} : ${i18n>dni} }" required = "true"/>
+                                <Input id = "dniEmpleado" value = "{employeeModel>/Dni}" liveChange = ".onDniChange"
+                                    valueState = "{employeeModel>/dniState}" valueStateText = "{i18n>campoObligatorio}"/>
+                                <Label id = "_IDGenLabel5" text = "{employeeModel>/sliderText}"/>
+                                <Slider id = "sliderEmpleado" min = "{employeeModel>/sliderMin}" max = "{employeeModel>/sliderMax}" value = "{employeeModel>/Amount}" 
+                                showAdvancedTooltip = "true" step = "{employeeModel>/sliderStep}" enableTickmarks="true" progress = "false" class = "sapUiSmallMarginBottom"/>
+                                <Label id = "_IDGenLabel6" text = "{i18n>incorporacion}" required = "true"/>
+                                <DatePicker id = "DPIncorporacion" dateValue = "{employeeModel>/CreationDate}" change = ".onDateChange"
+                                        valueState = "{employeeModel>/dateState}" valueStateText = "{i18n>campoObligatorio}" />
+                            </form:SimpleForm>
+                        </WizardStep>
+                        <WizardStep id = "infoAdicional" title = "{i18n>infoAdicional}">
+                            <MessageStrip id = "_IDGenMessageStrip3" type = "Information" text = "{i18n>infoAdicionalMsg}" showIcon = "true" class = "sapUiSmallMarginBottom"/>
+                            <Label id = "_IDGenLabel7" text = "{i18n>comentario}"/>
+                            <TextArea id = "_IDGenTextArea1" value = "{employeeModel>/Comments}" width="100%" class = "sapUiSmallMarginBottom"/>
+                            <upload:UploadSet id = "_IDGenUploadSet1" instantUpload = "false" maxFileNameLength = "55" maxFileSize = "10" 
+                                                uploadUrl = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments"/>
+                        </WizardStep>
+                    </Wizard>
+                </content>
+                <footer>
+                    <Bar id = "_IDGenBar1">
+                        <contentRight>
+                            <Button id = "_IDGenButton1" text = "{i18n>cancelar}" press = ".onCancel"/>
+                        </contentRight>
+                    </Bar>
+                </footer>
+            </Page>
+            <Page id = "wizardReviewPage" showHeader = "false">
+                <content>
+                    <form:SimpleForm id = "_IDGenSimpleForm1" title = "{i18n>tipoEmpleado}" minWidth = "1024" editable = "false" layout = "ResponsiveGridLayout">
+                        <form:content>
+                            <Label id = "_IDGenLabel8" text = "{i18n>tipo}"/>
+                            <Text id = "_IDGenText1"  text = "{= ${employeeModel>/Type} === 0 ? ${i18n>empleadoInterno} : 
+                                                                 ${employeeModel>/Type} === 1 ? ${i18n>empleadoAutonomo} : 
+                                                                 ${employeeModel>/Type} === 2 ? ${i18n>empleadoGerente} : '' }"/>
+                            <Link id = "_IDGenLink1" press = ".editStepOne" text = "{i18n>editar}" />
+                        </form:content>
+                    </form:SimpleForm>
+                    <form:SimpleForm id = "_IDGenSimpleForm2" title = "{i18n>datosEmpleado}" minWidth = "1024" editable = "false" layout = "ResponsiveGridLayout">
+                        <form:content>
+                            <Label id = "_IDGenLabel9" text = "{i18n>nombre}" />
+                            <Text id = "_IDGenText2"  text = "{employeeModel>/FirstName}"/>
+                            <Label id = "_IDGenLabel10" text = "{i18n>apellidos}" />
+                            <Text id = "_IDGenText3"  text = "{employeeModel>/LastName}"/>
+                            <Label id = "_IDGenLabel11" text = "{= ${employeeModel>/Type} === 1 ? ${i18n>cif} : ${i18n>dni} }" />
+                            <Text id = "_IDGenText4"  text = "{employeeModel>/Dni}"/>
+                            <Label id = "_IDGenLabel12" text = "{employeeModel>/sliderText}"/>
+                            <Text id = "_IDGenText5"  text = "{employeeModel>/Amount}"/>
+                            <Label id = "_IDGenLabel13" text = "{i18n>incorporacion}" />
+                            <Text id = "_IDGenText6"  text = "{employeeModel>/CreationDate}"/>
+                            <Link id = "_IDGenLink2" press = ".editStepTwo" text = "{i18n>editar}" />
+                        </form:content>
+                    </form:SimpleForm>
+                    <form:SimpleForm id = "_IDGenSimpleForm3" title = "{i18n>infoAdicional}" minWidth = "1024" editable = "false" layout = "ResponsiveGridLayout">
+                        <form:content>
+                            <Label id = "_IDGenLabel14" text = "{i18n>comentario}" />
+                            <Text id = "_IDGenText7"  text = "{employeeModel>/Comments}"/>
+                            <Label id = "_IDGenLabel15" text = "{i18n>documentos}" />
+                            <Text id = "_IDGenText8"  text = "{employeeModel>/fileList}"/>
+                            <Link id="_IDGenLink3" press = ".editStepThree" text = "{i18n>editar}" />
+                        </form:content>
+                    </form:SimpleForm>
+                </content>
+                <footer>
+                    <Bar id = "_IDGenBar2">
+                        <contentRight>
+                            <Button id = "_IDGenButton2" text = "{i18n>guardar}" press = "onWizardSubmit"/>
+                            <Button id = "_IDGenButton3" text = "{i18n>cancelar}" press = "onWizardCancel"/>
+                        </contentRight>
+                    </Bar>
+                </footer>
+            </Page>
+        </pages>
+    </NavContainer>
+</mvc:View>

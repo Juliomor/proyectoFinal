@@ -1,0 +1,5 @@
+{
+    "[xml].editor.defaultFormatter": "dotjoshjohnson.xml",
+    "[plaintext].editor.defaultFormatter": "dotjoshjohnson.xml",
+    "[javascript].editor.defaultFormatter": "dotjoshjohnson.xml"
+}

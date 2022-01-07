@@ -13,7 +13,7 @@
       "runtimeExecutable": "npx",
       "args": [
         "--open",
-        "test/flpSandbox.html#alightproyectofinal-display"
+        "index.html"
       ],
       "windows": {
         "runtimeExecutable": "npx.cmd"
@@ -23,7 +23,8 @@
       "env": {
         "run.config": "{\"handlerId\":\"fiori_tools\",\"runnableId\":\"/home/user/projects/proyectofinal\"}",
         "FIORI_TOOLS_UI5_VERSION": "",
-        "FIORI_TOOLS_UI5_URI": "https://ui5.sap.com"
+        "FIORI_TOOLS_UI5_URI": "https://ui5.sap.com",
+        "FIORI_TOOLS_BACKEND_CONFIG": "[{\"path\":\"/sap\",\"destination\":\"logaligroupERP\"}]"
       }
     }
   ]
