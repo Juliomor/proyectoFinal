@@ -2,7 +2,8 @@
 sap.ui.define([
     "alight/proyectofinal/controller/Base.controller",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageBox"
+    "sap/m/MessageBox",
+    "alight/proyectofinal/model/formatter"
 
 ],
     /**
@@ -10,10 +11,12 @@ sap.ui.define([
      * @param {typeof sap.ui.model.json.JSONModel} JSONModel
      * @param {typeof sap.m.MessageBox} MessageBox
      */
-    function (Base, JSONModel, MessageBox) {
+    function (Base, JSONModel, MessageBox, formatter) {
         "use strict";
 
         return Base.extend("alight.proyectofinal.controller.CrearEmpleado", {
+            formatter: formatter,
+
             onInit: function () {
 
                 this._oWizard = this.byId("empleadoWizard");
@@ -30,8 +33,8 @@ sap.ui.define([
                 this.getView().setModel(this.employeeModel, "employeeModel");
 
                 //Navigation
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.getRoute("CrearEmpleado").attachPatternMatched(this.onObjectMatched, this);
+                this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                this.oRouter.getRoute("CrearEmpleado").attachPatternMatched(this.onObjectMatched, this);
 
 
             },
@@ -50,8 +53,7 @@ sap.ui.define([
              * Go to main menu.
              */
             onCancel: function (oEvent) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteMain", true);
+                this.oRouter.navTo("RouteMain", true);
             },
 
             /**
@@ -179,9 +181,18 @@ sap.ui.define([
 
             /**
              * When all wizard steps are completed.
-             * Navigate to review page.
+             * Get incomplete files list and navigate to review page.
              */
             onWizardComplete: function (oEvent) {
+                var oPendingFiles = this.byId("ficherosAdicional").getIncompleteItems(),
+                    sFileNames = "";
+
+                if (oPendingFiles.length > 0) {
+                    for (let index = 0; index < oPendingFiles.length; index++) {
+                        sFileNames = sFileNames + oPendingFiles[index].getFileName() + "\n";
+                    }
+                }
+                this.employeeModel.setProperty("/fileList", sFileNames);
                 this._oNavContainer.to(this.byId("wizardReviewPage"));
             },
 
@@ -321,63 +332,63 @@ sap.ui.define([
                     Comments: employeeData.Comments,
                     UserToSalary: [
                         {
-                            Ammount: parseFloat(employeeData.Amount),
+                            Ammount: parseFloat(employeeData.Amount).toString(),
                             Comments: employeeData.Comments,
                             Waers: "EUR"
                         }
                     ]
                 }
-                this.getView().getModel("oDataEmployee").create("/Users", body, {
-                    success: function (data) {
-                        MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("EmployeeCreated") + ": " + data.EmployeeId);
+
+                new Promise((resolve, reject) => {
+                    this.getView().getModel("oDataEmployee").create("/Users", body, {
+                        success: function (data) {
+                            resolve(data);
+                        },
+                        error: function (error) {
+                            reject(error);
+                        }
+                    });
+                }).then(
+                    function (data) {
+                        this._uploadFiles(data.EmployeeId);
+                        MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("EmployeeCreated") + ": " + data.EmployeeId, {
+                            onClose: function () {
+                                this.oRouter.navTo("RouteMain", true);
+                            }
+                        });
                     },
-                    error: function (error) {
-                        MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("employeeNotCreated"));
-                    }
-                });
+                    function (error) {
+                        MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("employeeNotCreated") + "\n" + error);
+
+                    });
             },
 
 
 
             /**
-             * Upload the files
+             * Upload the files for the employee calling oData service
              */
-            _uploadFiles: function () {
+            _uploadFiles: function (sEmployeeId) {
 
-                var uploadUrl = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments";
-                var oUploadCollection = oEvent.getSource(),
-                    oCustomerHeaderToken = new sap.m.UploadCollectionParameter({
-                        name: "x-csrf-token",
-                        value: this.employeeModel.getSecurityToken()
+                var oUploadSet = this.byId("ficherosAdicional"),
+                    oPendingFiles = oUploadSet.getIncompleteItems();
+
+                if (oPendingFiles.length > 0) {
+                    var oHeaderField = new sap.ui.core.Item({
+                        text: "x-csrf-token",
+                        key: this.employeeModel.getSecurityToken()
                     });
+                    oUploadSet.addHeaderParameter(oHeaderField);
 
-                oUploadCollection.addHeaderParameter(oCustomerHeaderToken);
-
-                var fileName = oEvent.getParameter("fileName"),
-                    oContext = oEvent.getSource().getBindingContext("odataNorthwind").getObject(),
-                    slug = oContext.OrderID + ";" + this.getOwnerComponent().SapId + ";" + oContext.EmployeeID + ";" + fileName,
-                    oCustomerHeaderSlug = new sap.m.UploadCollectionParameter({
-                        name: "slug",
-                        value: slug
-                    });
-
-                oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
-
-                var oUploadCollection = this.byId("UploadCollection");
-                var oTextArea = this.byId("TextArea");
-                var cFiles = oUploadCollection.getItems().length;
-                var uploadInfo = cFiles + " file(s)";
-
-                if (cFiles > 0) {
-                    oUploadCollection.upload();
-
-                    if (oTextArea.getValue().length === 0) {
-                        uploadInfo = uploadInfo + " without notes";
-                    } else {
-                        uploadInfo = uploadInfo + " with notes";
+                    for (let index = 0; index < oPendingFiles.length; index++) {
+                        oHeaderField = new sap.ui.core.Item({
+                            text: "slug",
+                            key: this.getOwnerComponent().SapId + ";" + sEmployeeId + ";" + oPendingFiles[index].getFileName()
+                        });
+                        oUploadSet.addHeaderParameter(oHeaderField);
                     }
+                    oUploadSet.upload();
                 }
             }
-
         });
     });

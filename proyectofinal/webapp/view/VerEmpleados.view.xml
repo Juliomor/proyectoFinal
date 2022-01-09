@@ -1,8 +1,16 @@
-<mvc:View controllerName="alight.proyectofinal.controller.VerEmpleados"
-    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-        <content />
-    </Page>
+<mvc:View controllerName = "alight.proyectofinal.controller.VerEmpleados"
+    xmlns:mvc = "sap.ui.core.mvc" 
+    xmlns = "sap.m" displayBlock="true">
+    <SplitApp id = "verEmpleados" initialDetail = "detail" initialMaster = "master">
+        <masterPages>
+            <Page id = "master">
 
+            </Page>
+        </masterPages>
+        <detailPages>
+            <Page id = "detail">
+                <Text id = "_IDGenText1" text = "Seleccione un empleado" />
+            </Page>
+        </detailPages>
+    </SplitApp>
 </mvc:View>

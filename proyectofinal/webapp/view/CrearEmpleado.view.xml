@@ -42,8 +42,8 @@
                             <MessageStrip id = "_IDGenMessageStrip3" type = "Information" text = "{i18n>infoAdicionalMsg}" showIcon = "true" class = "sapUiSmallMarginBottom"/>
                             <Label id = "_IDGenLabel7" text = "{i18n>comentario}"/>
                             <TextArea id = "_IDGenTextArea1" value = "{employeeModel>/Comments}" width="100%" class = "sapUiSmallMarginBottom"/>
-                            <upload:UploadSet id = "_IDGenUploadSet1" instantUpload = "false" maxFileNameLength = "55" maxFileSize = "10" 
-                                                uploadUrl = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments"/>
+                            <upload:UploadSet id = "ficherosAdicional" instantUpload = "false" maxFileNameLength = "55" maxFileSize = "10" class = "sapUiSmallMarginBottom" 
+                                                uploadUrl = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" />
                         </WizardStep>
                     </Wizard>
                 </content>
@@ -77,7 +77,7 @@
                             <Label id = "_IDGenLabel12" text = "{employeeModel>/sliderText}"/>
                             <Text id = "_IDGenText5"  text = "{employeeModel>/Amount}"/>
                             <Label id = "_IDGenLabel13" text = "{i18n>incorporacion}" />
-                            <Text id = "_IDGenText6"  text = "{employeeModel>/CreationDate}"/>
+                            <Text id = "_IDGenText6"  text = "{path: 'employeeModel>/CreationDate', formatter: '.formatter.dateFormat'}"/>
                             <Link id = "_IDGenLink2" press = ".editStepTwo" text = "{i18n>editar}" />
                         </form:content>
                     </form:SimpleForm>
