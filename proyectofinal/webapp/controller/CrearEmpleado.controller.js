@@ -332,7 +332,7 @@ sap.ui.define([
                     Comments: employeeData.Comments,
                     UserToSalary: [
                         {
-                            Ammount: parseFloat(employeeData.Amount).toString(),
+                            Amount: parseFloat(employeeData.Amount).toString(),
                             Comments: employeeData.Comments,
                             Waers: "EUR"
                         }
@@ -354,13 +354,13 @@ sap.ui.define([
                         MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("EmployeeCreated") + ": " + data.EmployeeId, {
                             onClose: function () {
                                 this.oRouter.navTo("RouteMain", true);
-                            }
+                            }.bind(this)
                         });
-                    },
+                    }.bind(this),
                     function (error) {
                         MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("employeeNotCreated") + "\n" + error);
 
-                    });
+                    }.bind(this));
             },
 
 
@@ -371,23 +371,25 @@ sap.ui.define([
             _uploadFiles: function (sEmployeeId) {
 
                 var oUploadSet = this.byId("ficherosAdicional"),
-                    oPendingFiles = oUploadSet.getIncompleteItems();
+                    oPendingFiles = oUploadSet.getIncompleteItems(),
+                    oHeaderField;
 
-                if (oPendingFiles.length > 0) {
-                    var oHeaderField = new sap.ui.core.Item({
-                        text: "x-csrf-token",
-                        key: this.employeeModel.getSecurityToken()
-                    });
-                    oUploadSet.addHeaderParameter(oHeaderField);
-
-                    for (let index = 0; index < oPendingFiles.length; index++) {
+                for (let index = 0; index < oPendingFiles.length; index++) {
+                    if (oPendingFiles.length > 0) {
+                        oUploadSet.removeAllHeaderFields();
                         oHeaderField = new sap.ui.core.Item({
-                            text: "slug",
-                            key: this.getOwnerComponent().SapId + ";" + sEmployeeId + ";" + oPendingFiles[index].getFileName()
+                            key: "x-csrf-token",
+                            text: this.getView().getModel("oDataEmployee").getSecurityToken()
                         });
-                        oUploadSet.addHeaderParameter(oHeaderField);
+                        oUploadSet.addHeaderField(oHeaderField);
+
+                        oHeaderField = new sap.ui.core.Item({
+                            key: "slug",
+                            text: this.getOwnerComponent().SapId + ";" + sEmployeeId + ";" + oPendingFiles[index].getFileName()
+                        });
+                        oUploadSet.addHeaderField(oHeaderField);
+                        oUploadSet.uploadItem(oPendingFiles[index]);
                     }
-                    oUploadSet.upload();
                 }
             }
         });

@@ -1,0 +1,18 @@
+<core:FragmentDefinition 
+    xmlns:core = "sap.ui.core"
+    xmlns = "sap.m">
+    <Dialog title = "{i18n>nuevoAscenso}">
+        <content>
+            <Text text = "Salario:" />
+            <Input />
+            <Text text = "Fecha: "/>
+            <DatePicker />
+            <Text text = "Comentario: " />
+            <TextArea />
+        </content>
+        <buttons>
+            <Button text = "{i18n>close}" press = "onCloseOrders"/>
+            <Button text = "{i18n>close}" press = "onCloseOrders"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

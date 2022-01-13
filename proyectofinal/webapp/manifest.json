@@ -14,7 +14,7 @@
                 "uri": "/sap/opu/odata/sap/ZEMPLOYEES_SRV/",
                 "type": "OData",
                 "settings": {
-                    "localUri": "localService/ZEMPLOYEES_SRV/metadata.xml",
+                    "localUri": "localService/metadata.xml",
                     "odataVersion": "2.0"
                 }
             }
