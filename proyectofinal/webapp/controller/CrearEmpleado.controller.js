@@ -65,6 +65,7 @@ sap.ui.define([
                 this.byId("gerente").setPressed(false);
                 this.employeeModel.setProperty("/Type", 0);
                 this._updateSliderSettings(this.getI18nText("salarioBrutoAnual"), 12000, 80000, 24000, 1000);
+                this.byId("dniEmpleado").fireLiveChange();
                 if (this._oWizard.getProgressStep() === this.byId("tipoEmpleado")) {
                     this._oWizard.nextStep();
                 }
@@ -79,6 +80,7 @@ sap.ui.define([
                 this.byId("gerente").setPressed(false);
                 this.employeeModel.setProperty("/Type", 1);
                 this._updateSliderSettings(this.getI18nText("precioDiario"), 100, 2000, 400, 50);
+                this.byId("dniEmpleado").fireLiveChange();
                 if (this._oWizard.getProgressStep() === this.byId("tipoEmpleado")) {
                     this._oWizard.nextStep();
                 }
@@ -93,6 +95,7 @@ sap.ui.define([
                 this.byId("autonomo").setPressed(false);
                 this.employeeModel.setProperty("/Type", 2);
                 this._updateSliderSettings(this.getI18nText("salarioBrutoAnual"), 12000, 80000, 24000, 1000);
+                this.byId("dniEmpleado").fireLiveChange();
                 if (this._oWizard.getProgressStep() === this.byId("tipoEmpleado")) {
                     this._oWizard.nextStep();
                 }
@@ -109,7 +112,7 @@ sap.ui.define([
                     this.employeeModel.setProperty("/nombreState", "None");
                 }
 
-                this._checkEmployeeDataStep();
+                this._checkEmployeeDataStep(this._oWizard.getCurrentStep());
             },
 
             /**
@@ -123,7 +126,7 @@ sap.ui.define([
                     this.employeeModel.setProperty("/apellidosState", "None");
                 }
 
-                this._checkEmployeeDataStep();
+                this._checkEmployeeDataStep(this._oWizard.getCurrentStep());
             },
 
             /**
@@ -135,34 +138,42 @@ sap.ui.define([
                     number,
                     letter,
                     letterList,
-                    regularExp = /^\d{8}[a-zA-Z]$/;
+                    regularExp = /^\d{8}[a-zA-Z]$/,
+                    tipo = this.employeeModel.getProperty("/Type");
 
-                if (!dni) {
+                if (dni === undefined) {
+                    dni = this.byId("dniEmpleado").getValue();
+                }
+
+                if (dni === "") {
                     this.byId("dniEmpleado").setValueStateText(this.getI18nText("campoObligatorio"));
                     this.employeeModel.setProperty("/dniState", "Error");
                 } else {
-
-                    //Se comprueba que el formato es válido
-                    if (regularExp.test(dni) === true) {
-                        //Número
-                        number = dni.substr(0, dni.length - 1);
-                        //Letra
-                        letter = dni.substr(dni.length - 1, 1);
-                        number = number % 23;
-                        letterList = "TRWAGMYFPDXBNJZSQVHLCKET";
-                        letterList = letterList.substring(number, number + 1);
-                        if (letterList !== letter.toUpperCase()) {
+                    if (tipo !== 1) {
+                        //Se comprueba que el formato es válido
+                        if (regularExp.test(dni) === true) {
+                            //Número
+                            number = dni.substr(0, dni.length - 1);
+                            //Letra
+                            letter = dni.substr(dni.length - 1, 1);
+                            number = number % 23;
+                            letterList = "TRWAGMYFPDXBNJZSQVHLCKET";
+                            letterList = letterList.substring(number, number + 1);
+                            if (letterList !== letter.toUpperCase()) {
+                                this.employeeModel.setProperty("/dniState", "Error");
+                                this.byId("dniEmpleado").setValueStateText(this.getI18nText("dniIncorrecto"));
+                            } else {
+                                this.employeeModel.setProperty("/dniState", "None");
+                            }
+                        } else {
                             this.employeeModel.setProperty("/dniState", "Error");
                             this.byId("dniEmpleado").setValueStateText(this.getI18nText("dniIncorrecto"));
-                        } else {
-                            this.employeeModel.setProperty("/dniState", "None");
                         }
                     } else {
-                        this.employeeModel.setProperty("/dniState", "Error");
-                        this.byId("dniEmpleado").setValueStateText(this.getI18nText("dniIncorrecto"));
+                        this.employeeModel.setProperty("/dniState", "None");
                     }
                 }
-                this._checkEmployeeDataStep();
+                this._checkEmployeeDataStep(this._oWizard.getCurrentStep());
             },
 
             /**
@@ -176,7 +187,7 @@ sap.ui.define([
                     this.employeeModel.setProperty("/dateState", "None");
                 }
 
-                this._checkEmployeeDataStep();
+                this._checkEmployeeDataStep(this._oWizard.getCurrentStep());
             },
 
             /**
@@ -251,8 +262,6 @@ sap.ui.define([
             },
 
 
-
-
             /*****************************************************
              * PRIVATE FUNCTIONS
              ****************************************************/
@@ -273,6 +282,8 @@ sap.ui.define([
                     dniState: "Error",
                     dateState: "Error"
                 });
+                this.byId("ficherosAdicional").destroyItems();
+                this.byId("ficherosAdicional").destroyIncompleteItems();
             },
 
             /**
@@ -302,17 +313,17 @@ sap.ui.define([
             /**
              * Check Employee Data step if all states are None
              */
-            _checkEmployeeDataStep: function () {
+            _checkEmployeeDataStep: function (oStepId) {
                 var oData = this.employeeModel.getData();
                 if (oData.nombreState === "None" &&
                     oData.apellidosState === "None" &&
                     oData.dniState === "None" &&
                     oData.dateState === "None") {
 
-                    this.byId("datosEmpleado").setValidated(true);
+                    this.byId(oStepId).setValidated(true);
                 }
                 else {
-                    this.byId("datosEmpleado").setValidated(false);
+                    this.byId(oStepId).setValidated(false);
                 }
             },
 

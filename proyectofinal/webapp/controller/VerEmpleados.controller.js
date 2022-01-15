@@ -21,9 +21,6 @@ sap.ui.define([
 
                 this._oSplitApp = this.byId("verEmpleados");
 
-                this.employeeModel = new JSONModel();
-                this.getView().setModel(this.employeeModel, "employeeModel");
-
                 //Navigation
                 this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this.oRouter.getRoute("VerEmpleados").attachPatternMatched(this.onObjectMatched, this);
@@ -38,7 +35,7 @@ sap.ui.define([
                 this._oSplitApp.toDetail(this.byId("detail"));
 
                 //Read employees
-                this._readEmployeesOData();
+                //this._readEmployeesOData();
             },
 
             /**
@@ -90,12 +87,10 @@ sap.ui.define([
              * Show all details of the employee
              */
             onDetailsEmployee: function (oEvent) {
-                var path = oEvent.getSource().getBindingContext("employeeModel").getPath();
+                var path = oEvent.getSource().getBindingContext("oDataEmployee").getPath();
 
-                this.byId("employeeDetail").bindElement("employeeModel>" + path);
-                this._readEmployeeFiles(oEvent.getSource().getBindingContext("employeeModel").getObject().EmployeeId);
+                this.byId("employeeDetail").bindElement("oDataEmployee>" + path);
                 this._oSplitApp.toDetail(this.byId("employeeDetail"));
-
             },
 
             /**
@@ -103,12 +98,12 @@ sap.ui.define([
              * Show confirmation popup and send delete call to oData service when applicable.
              */
             onBajaEmployee: function (oEvent) {
-                var contextObj = oEvent.getSource().getBindingContext("employeeModel").getObject();
+                var contextObj = oEvent.getSource().getBindingContext("oDataEmployee").getObject();
 
                 MessageBox.confirm(this.getI18nText("deleteEmployee"), {
                     onClose: function (oAction) {
                         if (oAction === MessageBox.Action.OK) {
-                            this._deleteEmployee(contextObj.EmployeeId).bind(this);
+                            this._deleteEmployee(contextObj.EmployeeId);
                         }
                     }.bind(this)
                 });
@@ -121,83 +116,132 @@ sap.ui.define([
             onAscenderEmployee: function (oEvent) {
 
                 if (!this._oDialogPromotion) {
-                    this._oDialogPromotion = sap.ui.xmlfragment("alight.proyectofinal.fragment.DialogAscender", this);
+                    this._oDialogPromotion = sap.ui.xmlfragment("alight.proyectofinal.view.DialogAscender", this);
                     this.getView().addDependent(this._oDialogPromotion);
                 }
 
                 this._oDialogPromotion.open();
             },
 
+            /**
+             * When click on cancel button on promotion dialog.
+             * Close the dialog
+             */
+            onCancelarAscenso: function (oEvent) {
+                this._oDialogPromotion.close();
+            },
+
+            /**
+             * When remove an item from the file list.
+             * Call the oData remove function over /Attachments entity
+             */
+            onItemRemoved: function (oEvent) {
+                var sPath = oEvent.getParameter("item").getBindingContext("oDataEmployee").getPath();
+
+                this.getView().getModel("oDataEmployee").remove(sPath, {
+                    success: function (oData) {
+                        sap.m.MessageToast.show(this.getI18nText("fileDeleteOK"));
+                    }.bind(this),
+                    error: function (e) {
+                        sap.m.MessageToast.show(this.getI18nText("fileDeleteKO"));
+                    }.bind(this)
+                });
+
+            },
+
+            /**
+             * When new item is added to the file list.
+             * Add header parameters for the item
+             */
+            onItemAdded: function (oEvent) {
+                var oItem = oEvent.getParameter("item"),
+                    sEmployeeId = oItem.getBindingContext("oDataEmployee").getObject().EmployeeId,
+                    oToken = new sap.ui.core.Item({
+                        key: "x-csrf-token",
+                        text: this.getView().getModel("oDataEmployee").getSecurityToken()
+                    }),
+                    oSlug = new sap.ui.core.Item({
+                        key: "slug",
+                        text: this.getOwnerComponent().SapId + ";" + sEmployeeId + ";" + oItem.getFileName()
+                    });
+                oItem.addHeaderField(oToken).addHeaderField(oSlug);
+                oItem.setVisibleEdit(false);
+            },
+
+            onUploadCompleted: function (oEvent) {
+
+            },
+
+            /**
+             * When click on and item to download it.
+             * Fix the name of the downloading item to the proper filename
+             * Code from https://blogs.sap.com/2021/08/18/my-journey-towards-using-ui5-uploadset-with-cap-backend/
+             */
+            onOpenPressed: function (oEvent) {
+                oEvent.preventDefault();
+                var item = oEvent.getSource();
+                this._fileName = item.getFileName();
+                this._download(item)
+                    .then((blob) => {
+                        var url = window.URL.createObjectURL(blob);
+                        // //open in the browser
+                        // window.open(url);
+
+                        //download
+                        var link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', this._fileName);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            },
+
+            _download: function (item) {
+                var settings = {
+                    url: item.getUrl(),
+                    method: "GET",
+                    xhrFields: {
+                        responseType: "blob"
+                    }
+                }
+
+                return new Promise((resolve, reject) => {
+                    $.ajax(settings)
+                        .done((result, textStatus, request) => {
+                            resolve(result);
+                        })
+                        .fail((err) => {
+                            reject(err);
+                        })
+                });
+            },
 
 
             /*****************************************************
              * PRIVATE FUNCTIONS
              ****************************************************/
 
-            /**
-             * Read /Users entity from oData service.
-             */
-            _readEmployeesOData: function () {
-                this.getView().getModel("oDataEmployee").read("/Users", {
-                    filters: [
-                        new sap.ui.model.Filter("SapId", "EQ", this.getOwnerComponent().SapId)
-                    ],
-                    success: function (data) {
-                        this.employeeModel.setProperty("/Users", data.results);
-                    }.bind(this),
-                    error: function (e) {
-                        sap.m.MessageToast.show(this.getI18nText("oDataSaveKO"));
-                    }.bind(this)
-                });
-            },
 
             /**
-             * Read /Attachments entity from oData service for the corresponding employee id.
+             * Delete from /Users entity the corresponding input employee id.
              */
-            _readEmployeeFiles: function (sEmployeeId) {
-                this.getView().byId("ficherosEmpleado").bindAggregation("items", {
-                    path: "oDataEmployee>/Attachments",
-                    filters: [
-                        new Filter("SapId", FilterOperator.EQ, this.getOwnerComponent().SapId),
-                        new Filter("EmployeeId", FilterOperator.EQ, sEmployeeId)],
-                    template: new sap.m.upload.UploadSetItem({
-                        visibleEdit: false,
-                        fileName: "{oDataEmployee>DocName}",
-                        url: "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments(AttId='" + "{oDataEmployee>AttId}" + "',SapId='" + "{oDataEmployee>SapId}" + "',EmployeeId='" + sEmployeeId + "')/$value"
-                    })
-                });
-            },
-
             _deleteEmployee: function (sEmployeeId) {
                 if (sEmployeeId) {
-                    //Delete files first
-                    if (this.byId("ficherosEmpleado").getItems().length > 0) {
-                        /**this.getView().getModel("oDataEmployee").remove("/IncidentsSet(IncidenceId='" + data.IncidenceId + "',SapId='" + data.SapId + "',EmployeeId='" + data.EmployeeId + "')", {
-                            success: function () {
-                                this.onReadODataIncidence.bind(this)(data.EmployeeId);
-                                sap.m.MessageToast.show(oResourceBundle.getText("oDataDeleteOK"));
-                            }.bind(this),
-                            error: function (e) {
-                                sap.m.MessageToast.show(oResourceBundle.getText("oDataDeleteKO"));
-                            }.bind(this)
-                        });*/
-                    }
-
-                    //Delete employee
                     this.getView().getModel("oDataEmployee").remove("/Users(EmployeeId='" + sEmployeeId + "',SapId='" + this.getOwnerComponent().SapId + "')", {
                         success: function () {
-                            this._readEmployeesOData();
                             sap.m.MessageToast.show(this.getI18nText("oDataDeleteOK"));
+                            this.byId("listaEmpleados").getBinding("items").refresh();
                             this._oSplitApp.toDetail(this.byId("detail"));
                         }.bind(this),
                         error: function (e) {
                             sap.m.MessageToast.show(this.getI18nText("oDataDeleteKO"));
                         }.bind(this)
                     });
-
-
                 }
             }
-
         });
     });

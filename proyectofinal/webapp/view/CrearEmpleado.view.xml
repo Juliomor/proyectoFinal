@@ -38,7 +38,7 @@
                                         valueState = "{employeeModel>/dateState}" valueStateText = "{i18n>campoObligatorio}" />
                             </form:SimpleForm>
                         </WizardStep>
-                        <WizardStep id = "infoAdicional" title = "{i18n>infoAdicional}">
+                        <WizardStep id = "infoAdicional" title = "{i18n>infoAdicional}" complete = "onCompleteInfoAdicional">
                             <MessageStrip id = "_IDGenMessageStrip3" type = "Information" text = "{i18n>infoAdicionalMsg}" showIcon = "true" class = "sapUiSmallMarginBottom"/>
                             <Label id = "_IDGenLabel7" text = "{i18n>comentario}"/>
                             <TextArea id = "_IDGenTextArea1" value = "{employeeModel>/Comments}" width="100%" class = "sapUiSmallMarginBottom"/>
