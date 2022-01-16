@@ -53,8 +53,8 @@
                             </upload:UploadSet>
                         </IconTabFilter>
                         <IconTabFilter id = "tabHistorial" icon = "sap-icon://money-bills" text = "{i18n>historial}">
-                            <commons:Timeline id = "timeSalarios" enableDoubleSided = "true" content = "{oDataEmployee>UserToSalary}" 
-                                                showHeaderBar = "false" sortOldestFirst = "true">
+                            <commons:Timeline id = "timeSalarios" enableDoubleSided = "false" content = "{oDataEmployee>UserToSalary}" 
+                                                showHeaderBar = "false" sortOldestFirst = "true" groupByType = "Year" groupBy = "CreationDate">
                                 <commons:content>
                                     <commons:TimelineItem id = "_IDGenTimelineItem1" icon = "sap-icon://circle-task" text = "{oDataEmployee>Comments}" dateTime = "{ path: 'oDataEmployee>CreationDate', type: 'sap.ui.model.type.Date' }" 
                                                             userName = "{oDataEmployee>Amount}{oDataEmployee>Waers}">

@@ -91,6 +91,7 @@ sap.ui.define([
 
                 this.byId("employeeDetail").bindElement("oDataEmployee>" + path);
                 this._oSplitApp.toDetail(this.byId("employeeDetail"));
+                this._EmployeeId = oEvent.getSource().getBindingContext("oDataEmployee").getObject().EmployeeId;
             },
 
             /**
@@ -116,11 +117,15 @@ sap.ui.define([
             onAscenderEmployee: function (oEvent) {
 
                 if (!this._oDialogPromotion) {
-                    this._oDialogPromotion = sap.ui.xmlfragment("alight.proyectofinal.view.DialogAscender", this);
-                    this.getView().addDependent(this._oDialogPromotion);
+                    this._oDialogPromotion = this.loadFragment({
+                        name: "alight.proyectofinal.view.DialogAscender"
+                    });
                 }
-
-                this._oDialogPromotion.open();
+                this._oDialogPromotion.then(function (oDialog) {
+                    var oModel = new JSONModel([]);
+                    oDialog.setModel(oModel, "ascenderModel");
+                    oDialog.open();
+                }.bind(this));
             },
 
             /**
@@ -128,7 +133,33 @@ sap.ui.define([
              * Close the dialog
              */
             onCancelarAscenso: function (oEvent) {
-                this._oDialogPromotion.close();
+                this.byId("ascenderDialog").close();
+            },
+
+            /**
+             * When click on accept button 
+             */
+            onAceptarAscenso: function (oEvent) {
+                var oModel = this.byId("ascenderDialog").getModel("ascenderModel"),
+                    oData = oModel.getData(),
+                    body = {
+                        Amount: parseFloat(oData.Amount).toString(),
+                        CreationDate: oData.CreationDate,
+                        Comments: oData.Comments,
+                        SapId: this.getOwnerComponent().SapId,
+                        EmployeeId: this._EmployeeId
+                    }
+
+                this.getView().getModel("oDataEmployee").create("/Salaries", body, {
+                    success: function (data) {
+                        sap.m.MessageToast.show(this.getI18nText("oDataAscensoOK"));
+                        this.byId("ascenderDialog").close();
+                        oModel.setData(null);
+                    }.bind(this),
+                    error: function (error) {
+                        sap.m.MessageToast.show(this.getI18nText("oDataAscensoKO"));
+                    }.bind(this)
+                });
             },
 
             /**
