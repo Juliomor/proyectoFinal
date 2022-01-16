@@ -31,12 +31,14 @@
             <Page id = "employeeDetail">
                 <ObjectHeader id = "employeeHeader" icon = "{= ${oDataEmployee>Type} === '0' ? 'sap-icon://employee-pane' : 
                                  ${oDataEmployee>Type} === '1' ? 'sap-icon://employee' : 
-                                 ${oDataEmployee>Type} === '2' ? 'sap-icon://leads' : 'sap-icon://sys-help'}" title = "{oDataEmployee>FirstName} {oDataEmployee>LastName}" intro = "{oDataEmployee>Dni}" responsive = "true">
+                                 ${oDataEmployee>Type} === '2' ? 'sap-icon://leads' : 'sap-icon://sys-help'}" 
+                                title = "{oDataEmployee>FirstName} {oDataEmployee>LastName}" intro = "{oDataEmployee>Dni}" responsive = "true">
                     <attributes>
-                        <ObjectAttribute id = "_IDGenObjectAttribute1"  title = "{i18n>incorporacion}" text = "{ path: 'oDataEmployee>CreationDate', type: 'sap.ui.model.type.Date' }" />
+                        <ObjectAttribute id = "_IDGenObjectAttribute1"  title = "{i18n>incorporacion}" 
+                                         text = "{ path: 'oDataEmployee>CreationDate', type: 'sap.ui.model.type.Date' }" />
                         <ObjectAttribute id = "_IDGenObjectAttribute2"  title = "{i18n>tipo}" text = "{= ${oDataEmployee>Type} === '0' ? ${i18n>empleadoInterno} : 
-                                                                                                            ${oDataEmployee>Type} === '1' ? ${i18n>empleadoAutonomo} : 
-                                                                                                            ${oDataEmployee>Type} === '2' ? ${i18n>empleadoGerente} : '' }" />
+                                                                                                         ${oDataEmployee>Type} === '1' ? ${i18n>empleadoAutonomo} : 
+                                                                                                         ${oDataEmployee>Type} === '2' ? ${i18n>empleadoGerente} : '' }" />
                         <ObjectAttribute id = "_IDGenObjectAttribute3"  title = "{i18n>comentario}" text =  "{oDataEmployee>Comments}"/>
                     </attributes>
                 </ObjectHeader>
@@ -48,7 +50,7 @@
                                               afterItemRemoved = ".onItemRemoved" afterItemAdded = ".onItemAdded" uploadCompleted = ".onUploadCompleted">
                                 <upload:items>
                                     <upload:UploadSetItem id = "_IDGenUploadSetItem1" visibleEdit = "false" fileName = "{oDataEmployee>DocName}" openPressed = ".onOpenPressed"
-                                                          url = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments(AttId='{oDataEmployee>AttId}',SapId='{oDataEmployee>SapId}',EmployeeId='{oDataEmployee>EmployeeId}')/$value" />
+                                                            url = "/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments(AttId='{oDataEmployee>AttId}',SapId='{oDataEmployee>SapId}',EmployeeId='{oDataEmployee>EmployeeId}')/$value" />
                                 </upload:items>
                             </upload:UploadSet>
                         </IconTabFilter>
@@ -56,7 +58,8 @@
                             <commons:Timeline id = "timeSalarios" enableDoubleSided = "false" content = "{oDataEmployee>UserToSalary}" 
                                                 showHeaderBar = "false" sortOldestFirst = "true" groupByType = "Year" groupBy = "CreationDate">
                                 <commons:content>
-                                    <commons:TimelineItem id = "_IDGenTimelineItem1" icon = "sap-icon://circle-task" text = "{oDataEmployee>Comments}" dateTime = "{ path: 'oDataEmployee>CreationDate', type: 'sap.ui.model.type.Date' }" 
+                                    <commons:TimelineItem id = "_IDGenTimelineItem1" icon = "sap-icon://circle-task" text = "{oDataEmployee>Comments}" 
+                                                            dateTime = "{ path: 'oDataEmployee>CreationDate', type: 'sap.ui.model.type.Date' }" 
                                                             userName = "{oDataEmployee>Amount}{oDataEmployee>Waers}">
                                     </commons:TimelineItem>
                                 </commons:content>

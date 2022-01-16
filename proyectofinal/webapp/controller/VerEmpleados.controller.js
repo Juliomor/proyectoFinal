@@ -33,9 +33,6 @@ sap.ui.define([
 
                 //Reset detail
                 this._oSplitApp.toDetail(this.byId("detail"));
-
-                //Read employees
-                //this._readEmployeesOData();
             },
 
             /**
@@ -215,8 +212,6 @@ sap.ui.define([
                 this._download(item)
                     .then((blob) => {
                         var url = window.URL.createObjectURL(blob);
-                        // //open in the browser
-                        // window.open(url);
 
                         //download
                         var link = document.createElement('a');
@@ -255,7 +250,6 @@ sap.ui.define([
             /*****************************************************
              * PRIVATE FUNCTIONS
              ****************************************************/
-
 
             /**
              * Delete from /Users entity the corresponding input employee id.
