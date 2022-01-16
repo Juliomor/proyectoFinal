@@ -4,7 +4,6 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "alight/proyectofinal/model/formatter"
-
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Base
@@ -35,15 +34,12 @@ sap.ui.define([
                 //Navigation
                 this.oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this.oRouter.getRoute("CrearEmpleado").attachPatternMatched(this.onObjectMatched, this);
-
-
             },
 
             /**
              * When navigation is active.
              */
             onObjectMatched: function () {
-
                 //Reset wizard
                 this._resetWizard();
             },
@@ -186,7 +182,6 @@ sap.ui.define([
                 } else {
                     this.employeeModel.setProperty("/dateState", "None");
                 }
-
                 this._checkEmployeeDataStep(this._oWizard.getCurrentStep());
             },
 
@@ -373,8 +368,6 @@ sap.ui.define([
 
                     }.bind(this));
             },
-
-
 
             /**
              * Upload the files for the employee calling oData service
