@@ -196,8 +196,12 @@ sap.ui.define([
                 oItem.setVisibleEdit(false);
             },
 
+            /**
+             * When the upload has been completed.
+             * Refresh oData model
+             */
             onUploadCompleted: function (oEvent) {
-
+                this.getView().getModel("oDataEmployee").refresh();
             },
 
             /**
