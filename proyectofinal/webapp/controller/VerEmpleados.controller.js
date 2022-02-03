@@ -141,6 +141,7 @@ sap.ui.define([
                     oData = oModel.getData(),
                     body = {
                         Amount: parseFloat(oData.Amount).toString(),
+                        Waers: "EUR",
                         CreationDate: oData.CreationDate,
                         Comments: oData.Comments,
                         SapId: this.getOwnerComponent().SapId,
@@ -152,6 +153,7 @@ sap.ui.define([
                         sap.m.MessageToast.show(this.getI18nText("oDataAscensoOK"));
                         this.byId("ascenderDialog").close();
                         oModel.setData(null);
+                        this.getView().getModel("oDataEmployee").refresh();
                     }.bind(this),
                     error: function (error) {
                         sap.m.MessageToast.show(this.getI18nText("oDataAscensoKO"));
